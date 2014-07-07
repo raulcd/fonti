@@ -28,6 +28,10 @@ SOCIAL = (('You can add links in your config file', '#'),
           ('Another social link', '#'),)
 
 
+STATIC_PATHS = ['extra/CNAME']
+EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
+
+
 DEFAULT_PAGINATION = False
 AUTHOR_SAVE_AS = False
 AUTHORS_SAVE_AS = False
