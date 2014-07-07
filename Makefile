@@ -26,6 +26,7 @@ CLOUDFILES_CONTAINER=my_cloudfiles_container
 DROPBOX_DIR=~/Dropbox/Public/
 
 GITHUB_PAGES_BRANCH=gh-pages
+GITHUB_USERNAME=raulcd
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
@@ -105,6 +106,6 @@ cf_upload: publish
 
 github: publish
 	ghp-import -b $(GITHUB_PAGES_BRANCH) $(OUTPUTDIR)
-	git push origin $(GITHUB_PAGES_BRANCH)
+	git push git@github.com:$(GITHUB_USERNAME)/$(GITHUB_USERNAME).github.io.git $(GITHUB_PAGES_BRANCH):master
 
 .PHONY: html help clean regenerate serve devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload s3_upload cf_upload github
