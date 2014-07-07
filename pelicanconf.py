@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = u'Raul Cumplido'
-SITENAME = u'Raul Cumplido'
+AUTHOR = u'Raúl Cumplido'
+SITENAME = u'Raúl Cumplido'
 SITEURL = ''
 
 PATH = 'content'
@@ -27,7 +27,14 @@ LINKS = (('Pelican', 'http://getpelican.com/'),
 SOCIAL = (('You can add links in your config file', '#'),
           ('Another social link', '#'),)
 
-DEFAULT_PAGINATION = 10
 
+DEFAULT_PAGINATION = False
+AUTHOR_SAVE_AS = False
+AUTHORS_SAVE_AS = False
+TAG_SAVE_AS = False
+TAGS_SAVE_AS = False
+CATEGORY_SAVE_AS = False
+CATEGORIES_SAVE_AS = False
+ARCHIVES_SAVE_AS = False
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
