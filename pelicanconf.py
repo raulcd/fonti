@@ -38,6 +38,10 @@ STATIC_PATHS = ['extra/CNAME']
 EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
 
 
+TWITTER_USERNAME='raulcd'
+
+DISQUS_SITENAME = 'raulcd'
+
 DEFAULT_PAGINATION = False
 AUTHOR_SAVE_AS = False
 AUTHORS_SAVE_AS = False
