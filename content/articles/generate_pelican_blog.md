@@ -1,6 +1,5 @@
 Title: Create Blog using Pelican and deploy in github pages
 Date: 2014-07-07 18:30
-Tags: pelican, blog, python
 Summary: How to create your Pelican Blog and deploy on github pages
 
 This website has been created using pelican. 

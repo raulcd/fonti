@@ -43,12 +43,5 @@ TWITTER_USERNAME='raulcd'
 DISQUS_SITENAME = 'raulcd'
 
 DEFAULT_PAGINATION = False
-AUTHOR_SAVE_AS = False
-AUTHORS_SAVE_AS = False
-TAG_SAVE_AS = False
-TAGS_SAVE_AS = False
-CATEGORY_SAVE_AS = False
-CATEGORIES_SAVE_AS = False
-ARCHIVES_SAVE_AS = False
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
