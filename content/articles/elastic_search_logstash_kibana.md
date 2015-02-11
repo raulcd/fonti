@@ -1,24 +1,26 @@
-Title: ELK on Docker
+Title: Elasticsearch, Logstash and Kibana on Docker
 Date: 2015-02-11 18:30
-Summary: Set up Elasticsearch - Logstash - Kibana stack in a docker container
-Status: draft
+Summary: Set up Elasticsearch - Logstash - Kibana stack in a Docker container
 
-While doing performance testing on a project I got to the situation where 
-I need to define the navigation profile of the current users to be sure that
-the tests are reflecting what the users are doing.
+While doing performance testing on a project I needed to process the access logs
+of our web servers to define the navigation profile of our current users. 
 
-We do not have any type of analysis and the only thing that I have are
-the access logs of our web server.
-
-I have heard of Logstash, Elasticsearch and Kibana so I thought it would be good to give it a try.
+So I though it would be a nice time to play with Elasticsearch, Logstash and Kibana 
+as I've heard of the stack.
 
 ## ELK Stack
 
+The first thing to notice when using it is how easy to use is. It took me a couple of hours
+since I decided to use it to have a prototype working on my local host. So let's see each one of them.
+
+![kibana stack image]({filename}/images/log-logstash-elasticsearch-kibana-flow-small.jpg)
+
 ### Elasticsearch
 
-[Elasticsearch](http://www.elasticsearch.org/overview/elasticsearch) and 
-the [Github Elasticsearch project](https://github.com/elasticsearch/elasticsearch)
-In order to set up Elastic Search the only thing that you need to do is, download the package an execute it:
+[Elasticsearch](http://www.elasticsearch.org/overview/elasticsearch) is a search server based on Lucene. 
+Is Open Source and can be found on the [Github Elasticsearch project](https://github.com/elasticsearch/elasticsearch)
+
+In order to set up Elastic Search the only thing that you need to do is, download the package and execute it:
 
 ```console
 ➜  wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.2.tar.gz
@@ -66,9 +68,9 @@ You can also get the stats by doing:
 {"_shards":{"total":0,"successful":0,"failed":0},"_all":{"primaries":{},"total":{}},"indices":{}}
 ```
 
-When I was playing I processes several times different logs. So in order to clean all the information of
-my elasticsearch instance I found quite useful the following command that *wil remove* all your
-existing data. So *BE CAREFULL*:
+When I was playing I processed several times different logs. So in order to clean all the information of
+my elasticsearch instance I found quite useful the following command that ***will remove*** all your
+existing data. So ***BE CAREFULL***:
 
 ```console
 ➜  curl -XDELETE "http://localhost:9200/*"
@@ -77,7 +79,10 @@ existing data. So *BE CAREFULL*:
 
 ### Logstash
 
-[Logstash](http://logstash.net/) and the [Github project repo](https://github.com/elasticsearch/logstash).
+[Logstash](http://logstash.net/) is a tool to manage events and logs. Basically you use it to collect, parse and store logs.
+When used with elasticsearch you can send the processed logs structured to elasticsearch to be queried.
+It's also Open Source, it's part of the elasticsearch family and you can find the source code on
+the [Github project repo](https://github.com/elasticsearch/logstash).
 
 In order to setup Logstash you will need to Download the package:
 
@@ -87,14 +92,14 @@ In order to setup Logstash you will need to Download the package:
 ➜  cd logstash-1.4.2
 ```
 
-In order to process your Access logs and send them to elastic search you will need to create the logstash configuration file.
-I have created the next one:
+To process your Access logs and send them to Elasticsearch you will need to create the logstash configuration file.
+My configuration file is similar to the following one:
 
 ```console
 ➜  cat logstash_simple.conf 
 input {
   file {
-    path => "/var/logs/access-logs/*.log"
+    path => "/var/log/access/*.log"
     type => "apache_access"
   }
 }
@@ -123,13 +128,14 @@ output {
 ```
 
 In the input section we define which logs logstash needs to process. You can define
-different types of input but we are getting directly from a file. To see other types of
-input take a look at the [documentation](http://logstash.net/docs/1.4.2/).
+different types of input but we are basically just getting them from files. 
+To see other types of input take a look at the [documentation](http://logstash.net/docs/1.4.2/).
 
-The filter is how logstash will process your logs. We are using grok which is a like a regex parser 
-for unstructured data. We just use the %{COMBINEDAPACHELOG} regex and set the date format.
+The filter is how logstash will process your logs. We are using grok which is like a regex parser 
+for unstructured data. We just use the *%{COMBINEDAPACHELOG}* regex and set the date format.
 
-For the output we have created two outputs. Our Elasticsearch instance and standard output.
+For the output we have created two outputs. Our Elasticsearch instance and standard output,
+basically to see what is going on.
 
 In order to run logstash:
 
@@ -139,8 +145,8 @@ In order to run logstash:
 
 ### Kibana
 
-[Kibana](http://www.elasticsearch.org/overview/kibana/) is a visualization tool for data from 
-elasticsearch. The [Github project](https://github.com/elasticsearch/kibana).
+[Kibana](http://www.elasticsearch.org/overview/kibana/) is a visualization tool for data on top
+of elasticsearch. The [Github project](https://github.com/elasticsearch/kibana).
 
 In order to set it up just download it and run it:
 
@@ -156,29 +162,41 @@ The Kibana Backend is starting up... be patient
 And kibana should be running on your localhost at port 5601.
 
 The first page will ask you to create an index. If you don't have any data yet you will not be able to create it.
-You can create index and start playing querying the data.
+Once you have created the index you can start playing querying the data.
 
 ## Deploy
 
 Once the Stack was locally working I thought it would be good to deploy it to one of our boxes
 and send periodically our access logs to be able to have the logs updated every once in a while.
 
-And I thought that maybe creating a container to be able to replicate it easily on the future may
+And I thought that maybe creating a Docker container to be able to replicate it easily on the future may
 be a good possibility.
 
-### Docker Container Generation
+![Docker image]({filename}/images/docker_logo.png)
 
-Create one unique docker file. Not really the best practice but the easiest way:
+### First Approach - One to rule them all
 
-Supervisor and mounting a volume exposing only the port for kibana. The volume is were the docs will be added.
+My first approach was to create a single container with the three services running on top of it.
+I know that's not how you are supposed to use Docker but I wanted to try first.
+
+So my idea was to have it everything running with supervisor on the docker container and add a data volume 
+to the container with the logs where logstash will pick the files.
+
+The code is available on [this Github repo](https://github.com/raulcd/elk-docker).
+
+#### Create the image
+
+As it is my first post about Docker I will explain a little bit how to create the image and build it.
+The image created was from a basic ubuntu one and basically you need to create a file called Dockerfile
+with [the information in the link](https://github.com/raulcd/elk-docker/blob/master/Dockerfile).
 
 In order to build the container you just need to run:
 
 ```console
-docker build -t elk:latest .
+➜  docker build -t elk:latest .
 ```
 
-You should have your image listed when
+This will create a local image that can be executed. You can list your images doing:
 
 ```console
 ➜  docker images
@@ -186,9 +204,16 @@ REPOSITORY                         TAG                 IMAGE ID            CREAT
 elk                                latest              28bf7af29dc1        55 seconds ago      575.7 MB
 ```
 
+#### Running the image
 
-Separate containers (TODO)
+Once the image is built you can run it just by doing:
 
-### Deploying container
+```code
+➜  docker run -d -p 5000:5601 --name elk -v /path/access-logs:/var/log/access elk
+```
 
-### Sending logs and processing
+This will link your local port *5000* with the port *5601* on the container (which is the kibana one) and will
+add you local */path/access-logs* to the container. Is at this path where you are supposed to be logging your
+access logs.
+
+TODO Images, separate containers, push the image to docker hub

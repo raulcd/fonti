@@ -34,7 +34,7 @@ SOCIAL = (('twitter', 'http://twitter.com/raulcumplido'),
           ('github', 'http://github.com/raulcd'),)
 
 
-STATIC_PATHS = ['extra/CNAME']
+STATIC_PATHS = ['extra/CNAME', 'images']
 EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
 
 
