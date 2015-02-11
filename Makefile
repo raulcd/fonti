@@ -106,6 +106,6 @@ cf_upload: publish
 
 github: publish
 	ghp-import -b $(GITHUB_PAGES_BRANCH) $(OUTPUTDIR)
-	git push git@github.com:$(GITHUB_USERNAME)/$(GITHUB_USERNAME).github.io.git $(GITHUB_PAGES_BRANCH):master
+	git push -f git@github.com:$(GITHUB_USERNAME)/$(GITHUB_USERNAME).github.io.git $(GITHUB_PAGES_BRANCH):master
 
 .PHONY: html help clean regenerate serve devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload s3_upload cf_upload github
